@@ -1,0 +1,204 @@
+SELECT mainbranch, count(*) as mainbranch_freq, ROUND(COUNT(*)::DECIMAL / (SELECT COUNT(*) FROM survey_results) * 100, 2) AS mainbranch_pct
+FROM survey_results
+GROUP BY mainbranch
+ORDER BY mainbranch_freq desc;
+
+-- Here we can see that 75% of respondents are professional developers and 10% are part-time devlopers.
+-- This indicates that the majority of the respondents are working professionally, making this dataset good for our case.
+
+DROP VIEW IF EXISTS survey_results_with_professional;
+CREATE VIEW survey_results_with_professional AS
+SELECT *,
+	CASE 
+		WHEN mainbranch IN ('I am a developer by profession', 'I am not primarily a developer, but I write code sometimes as part of my work/studies') THEN 'Professional'
+		WHEN mainbranch IN ('I am learning to code') THEN 'Learning to code'
+		ELSE 'Other'
+	END AS professional
+FROM survey_results;
+
+SELECT edlevel, count(*) as edlevel_freq,
+ROUND(COUNT(*)::DECIMAL / (SELECT COUNT(*) FROM survey_results_with_professional where professional = FALSE) * 100, 2) AS pct
+FROM survey_results_with_professional
+WHERE professional = FALSE
+GROUP BY edlevel
+ORDER BY edlevel_freq desc;
+
+SELECT edlevel, count(*) as edlevel_freq,
+ROUND(COUNT(*)::DECIMAL / (SELECT COUNT(*) FROM survey_results_with_professional where professional = TRUE)* 100, 2) AS pct
+FROM survey_results_with_professional
+WHERE professional = TRUE
+GROUP BY edlevel
+ORDER BY edlevel_freq desc;
+
+WITH unnest_learncode AS (
+    SELECT unnest(string_to_array(learncode, ';')) AS learncode_array, professional
+    FROM survey_results_with_professional
+), filtered_learncode AS (
+    SELECT learncode_array, professional
+    FROM unnest_learncode
+    WHERE learncode_array != 'NA'
+), total_learncode AS (
+	SELECT learncode_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncode !='NA'), 4) AS total_PCT
+	FROM filtered_learncode
+	GROUP BY learncode_array
+), professional_learncode AS (
+	SELECT learncode_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncode !='NA' AND professional = 'Professional'), 4) AS Professional_PCT
+	FROM filtered_learncode
+	WHERE professional = 'Professional'
+	GROUP BY learncode_array
+), learningToCode_learncode AS (
+	SELECT learncode_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncode !='NA' AND professional = 'Learning to code'), 4) AS LearningToCode_PCT
+	FROM filtered_learncode
+	WHERE professional = 'Learning to code'
+	GROUP BY learncode_array
+), Other_learncode AS (
+	SELECT learncode_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncode !='NA' AND professional = 'Other'), 4) AS Other_PCT
+	FROM filtered_learncode
+	WHERE professional = 'Other'
+	GROUP BY learncode_array
+)
+SELECT p.learncode_array, t.total_pct, p.Professional_PCT,l.LearningToCode_PCT, O.Other_PCT
+FROM Professional_learncode p
+JOIN LearningToCode_learncode l
+ON p.learncode_array = l.learncode_array
+JOIN Other_learncode O
+ON p.learncode_array = O.learncode_array
+JOIN total_learncode t
+ON p.learncode_array = t.learncode_array;
+
+WITH unnest_learncodeonline AS (
+    SELECT unnest(string_to_array(learncodeonline, ';')) AS learncodeonline_array, professional
+    FROM survey_results_with_professional
+), filtered_learncodeonline AS (
+    SELECT learncodeonline_array, professional
+    FROM unnest_learncodeonline
+    WHERE learncodeonline_array != 'NA'
+), total_learncodeonline AS (
+    SELECT learncodeonline_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncodeonline != 'NA'), 4) AS total_PCT
+    FROM filtered_learncodeonline
+    GROUP BY learncodeonline_array
+), professional_learncodeonline AS (
+    SELECT learncodeonline_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncodeonline != 'NA' AND professional = 'Professional'), 4) AS Professional_PCT
+    FROM filtered_learncodeonline
+    WHERE professional = 'Professional'
+    GROUP BY learncodeonline_array
+), learningToCode_learncodeonline AS (
+    SELECT learncodeonline_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncodeonline != 'NA' AND professional = 'Learning to code'), 4) AS LearningToCode_PCT
+    FROM filtered_learncodeonline
+    WHERE professional = 'Learning to code'
+    GROUP BY learncodeonline_array
+), other_learncodeonline AS (
+    SELECT learncodeonline_array,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results_with_professional WHERE learncodeonline != 'NA' AND professional = 'Other'), 4) AS Other_PCT
+    FROM filtered_learncodeonline
+    WHERE professional = 'Other'
+    GROUP BY learncodeonline_array
+)
+SELECT p.learncodeonline_array, t.total_pct, p.Professional_PCT, l.LearningToCode_PCT, o.Other_PCT
+FROM professional_learncodeonline p
+JOIN learningToCode_learncodeonline l ON p.learncodeonline_array = l.learncodeonline_array
+JOIN other_learncodeonline o ON p.learncodeonline_array = o.learncodeonline_array
+JOIN total_learncodeonline t ON p.learncodeonline_array = t.learncodeonline_array;
+
+
+WITH unnest_learncodecoursescert AS (
+    SELECT unnest(string_to_array(learncodecoursescert, ';')) AS learncodecoursescert_array
+    FROM survey_results
+), filtered_learncodecoursescert AS (
+    SELECT learncodecoursescert_array
+    FROM unnest_learncodecoursescert
+    WHERE learncodecoursescert_array != 'NA'
+)
+SELECT 
+    learncodecoursescert_array, 
+    COUNT(*) AS Freq,
+    ROUND(COUNT(*)::DECIMAL / (SELECT count(*) FROM survey_results WHERE learncodecoursescert !='NA') * 100, 2) AS PCT
+FROM filtered_learncodecoursescert
+GROUP BY learncodecoursescert_array
+ORDER BY Freq DESC;
+
+--Experience
+
+WITH yearscodebins AS (
+	SELECT
+		CASE
+			WHEN yearscode = 'Less than 1 year' THEN '<01'
+			WHEN yearscode = 'More than 50 years' THEN '50+'
+			WHEN yearscode::INTEGER < 5 THEN '01-04'
+			WHEN yearscode::INTEGER >= 5 AND yearscode::INTEGER < 10 THEN '05-09'
+			WHEN yearscode::INTEGER >= 10 AND yearscode::INTEGER < 15 THEN '10-14'
+			WHEN yearscode::INTEGER >= 15 AND yearscode::INTEGER < 20 THEN '15-19'
+			WHEN yearscode::INTEGER >= 20 AND yearscode::INTEGER < 25 THEN '20-24'
+			WHEN yearscode::INTEGER >= 25 AND yearscode::INTEGER < 30 THEN '25-29'
+			WHEN yearscode::INTEGER >= 30 AND yearscode::INTEGER < 35 THEN '30-34'
+			WHEN yearscode::INTEGER >= 35 AND yearscode::INTEGER < 40 THEN '35-39'
+			WHEN yearscode::INTEGER >= 40 AND yearscode::INTEGER < 45 THEN '40-44'
+			WHEN yearscode::INTEGER >= 45 THEN '45-49'
+			ELSE yearscode
+		END AS yearscodebins
+	FROM survey_results
+	WHERE yearscode != 'NA'
+)
+SELECT yearscodebins, count(*) AS Freq,
+ROUND(COUNT(*)::DECIMAL / (SELECT COUNT(*) FROM survey_results WHERE yearscode != 'NA') * 100,2) AS PCT
+FROM yearscodebins
+GROUP BY yearscodebins
+ORDER BY yearscodebins ASC;
+
+WITH yearscodepro_bins AS (
+    SELECT
+        CASE
+            WHEN yearscodepro = 'Less than 1 year' THEN '<01'
+            WHEN yearscodepro = 'More than 50 years' THEN '50+'
+            WHEN yearscodepro::INTEGER < 5 THEN '01-04'
+            WHEN yearscodepro::INTEGER >= 5 AND yearscodepro::INTEGER < 10 THEN '05-09'
+            WHEN yearscodepro::INTEGER >= 10 AND yearscodepro::INTEGER < 15 THEN '10-14'
+            WHEN yearscodepro::INTEGER >= 15 AND yearscodepro::INTEGER < 20 THEN '15-19'
+            WHEN yearscodepro::INTEGER >= 20 AND yearscodepro::INTEGER < 25 THEN '20-24'
+            WHEN yearscodepro::INTEGER >= 25 AND yearscodepro::INTEGER < 30 THEN '25-29'
+            WHEN yearscodepro::INTEGER >= 30 AND yearscodepro::INTEGER < 35 THEN '30-34'
+            WHEN yearscodepro::INTEGER >= 35 AND yearscodepro::INTEGER < 40 THEN '35-39'
+            WHEN yearscodepro::INTEGER >= 40 AND yearscodepro::INTEGER < 45 THEN '40-44'
+            WHEN yearscodepro::INTEGER >= 45 THEN '45-49'
+            ELSE yearscodepro
+        END AS yearscodepro_bins
+    FROM survey_results
+    WHERE yearscodepro != 'NA'
+)
+SELECT yearscodepro_bins, count(*) AS Freq,
+ROUND(COUNT(*)::DECIMAL / (SELECT COUNT(*) FROM survey_results WHERE yearscodepro != 'NA') * 100,2) AS PCT
+FROM yearscodepro_bins
+GROUP BY yearscodepro_bins
+ORDER BY yearscodepro_bins ASC;
+
+SELECT devtype, count(*) AS Freq,
+ROUND(COUNT(*)::DECIMAL / (SELECT COUNT(*) FROM survey_results WHERE devtype != 'NA') * 100, 2) AS PCT
+FROM survey_results
+WHERE devtype != 'NA'
+GROUP BY devtype
+ORDER BY Freq DESC;
+
+WITH devtype_yearscodepro AS (
+	SELECT devtype,
+	CASE 
+		WHEN yearscodepro = 'Less than 1 year' THEN '0'
+		WHEN yearscodepro = 'More than 50 years' THEN '51'
+		ELSE yearscodepro
+	END AS yearscodeproint
+	FROM survey_results
+	WHERE yearscodepro != 'NA'
+	AND devtype != 'NA'
+)
+SELECT devtype, ROUND(AVG(yearscodeproint::INTEGER),2) AS avg_yearscodepro
+FROM devtype_yearscodepro
+GROUP BY devtype
+ORDER BY avg_yearscodepro DESC;
+
+SELECT count(*) FROM survey_results;

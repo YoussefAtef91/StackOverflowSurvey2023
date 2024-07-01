@@ -1,0 +1,101 @@
+"language1","language2","count"
+"HTML/CSS","JavaScript",41117
+"JavaScript","SQL",31870
+"JavaScript","TypeScript",29947
+"HTML/CSS","SQL",27992
+"JavaScript","Python",27339
+"HTML/CSS","TypeScript",24428
+"HTML/CSS","Python",23174
+"Python","SQL",22557
+"Bash/Shell (all shells)","JavaScript",19381
+"SQL","TypeScript",18919
+"Java","JavaScript",18830
+"Bash/Shell (all shells)","Python",18545
+"Bash/Shell (all shells)","HTML/CSS",17004
+"C#","JavaScript",16957
+"Bash/Shell (all shells)","SQL",16344
+"Python","TypeScript",15996
+"Java","SQL",15538
+"HTML/CSS","Java",15386
+"C#","SQL",15048
+"Java","Python",14967
+"C#","HTML/CSS",14834
+"JavaScript","PHP",14299
+"C++","Python",13363
+"HTML/CSS","PHP",12870
+"Bash/Shell (all shells)","TypeScript",12151
+"C++","JavaScript",11880
+"C","Python",11867
+"PHP","SQL",11779
+"Java","TypeScript",11385
+"C","C++",11340
+"C#","TypeScript",11186
+"C#","Python",10614
+"C","JavaScript",10573
+"Bash/Shell (all shells)","Java",10312
+"C++","HTML/CSS",10302
+"C","HTML/CSS",9366
+"JavaScript","PowerShell",9162
+"C++","SQL",9013
+"PowerShell","SQL",8601
+"HTML/CSS","PowerShell",8409
+"C","SQL",8306
+"Bash/Shell (all shells)","C++",8169
+"C++","Java",8160
+"Bash/Shell (all shells)","C",8139
+"Go","JavaScript",8042
+"PHP","Python",7893
+"C","Java",7639
+"C#","Java",7553
+"Python","Rust",7549
+"Go","Python",7401
+"JavaScript","Rust",7323
+"PHP","TypeScript",7122
+"C#","PowerShell",7036
+"C#","C++",7009
+"Bash/Shell (all shells)","C#",6876
+"PowerShell","Python",6836
+"C++","TypeScript",6459
+"Go","SQL",6375
+"Go","HTML/CSS",6185
+"Bash/Shell (all shells)","PowerShell",6157
+"Go","TypeScript",6000
+"PowerShell","TypeScript",5985
+"HTML/CSS","Rust",5963
+"Bash/Shell (all shells)","PHP",5955
+"Rust","TypeScript",5947
+"Bash/Shell (all shells)","Go",5909
+"Java","PHP",5845
+"C","TypeScript",5614
+"Java","Kotlin",5553
+"C","C#",5425
+"Bash/Shell (all shells)","Rust",5424
+"JavaScript","Kotlin",5243
+"Rust","SQL",5215
+"C#","PHP",4670
+"Go","Java",4402
+"Kotlin","Python",4283
+"C++","Rust",4269
+"C","Rust",4253
+"Java","PowerShell",4252
+"HTML/CSS","Kotlin",4242
+"JavaScript","Ruby",4227
+"C++","PHP",4190
+"Kotlin","SQL",4173
+"C","PHP",3957
+"JavaScript","Lua",3954
+"Java","Rust",3949
+"Kotlin","TypeScript",3926
+"Dart","JavaScript",3894
+"Assembly","C",3828
+"Lua","Python",3768
+"HTML/CSS","Lua",3473
+"Assembly","Python",3471
+"C++","PowerShell",3467
+"HTML/CSS","Ruby",3430
+"Go","Rust",3339
+"Assembly","C++",3322
+"Dart","HTML/CSS",3305
+"Ruby","SQL",3252
+"C++","Go",3173
+"Assembly","JavaScript",3169
